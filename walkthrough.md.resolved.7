@@ -1,0 +1,67 @@
+# Walkthrough - Independent Backend Structure
+
+لقد قمت بتنظيم المشروع إلى مشروعين مستقلين تماماً لضمان أفضل أداء وسهولة في النشر.
+
+## 1. مشروع التخزين الجديد (`storage-backend`)
+هذا هو المجلد المخصص للرفع على **Hostinger**.
+- **المكان**: `d:\Projects After graduation\freelance\Tilal\storage-backend`
+- **المحتوى**: 
+    - [storage-server.js](file:///d:/Projects%20After%20graduation/freelance/Tilal/tilal-backend/storage-server.js): السيرفر الرئيسي للتخزين.
+    - `src/providers/`: يحتوي على منطق تحويل الصور لـ WebP والضغط.
+    - `uploads/`: المجلد الذي ستخزن فيه الملفات فعلياً.
+    - [package.json](file:///d:/Projects%20After%20graduation/freelance/Tilal/tilal-front/package.json): يحتوي على كل الـ dependencies اللازمة.
+- **طريقة النشر**:
+    1. ارفع هذا المجلد إلى هوستنجر.
+    2. نفذ `npm install`.
+    3. أنشئ ملف [.env](file:///d:/Projects%20After%20graduation/freelance/Tilal/tilal-front/.env) وقم بضبط الـ `STORAGE_SERVER_API_KEY`.
+    4. شغله باستخدام `npm start`.
+
+## 2. الباك إند الرئيسي (`tilal-backend`)
+هذا المجلد مخصص للرفع على **Render** (أو أي استضافة أخرى).
+- **المكان**: `d:\Projects After graduation\freelance\Tilal\tilal-backend`
+- **التعديلات**: تمت إزالة كل الملفات المؤقتة الخاصة بسيرفر التخزين ليبقى المشروع نظيفاً.
+- **الربط**: يستخدم [HttpStorageProvider](file:///d:/Projects%20After%20graduation/freelance/Tilal/tilal-backend/src/providers/upload/HttpStorageProvider.js#9-91) للتواصل مع سيرفر هوستنجر.
+
+---
+
+## كيف تختبر الربط؟
+
+1. بعد تشغيل `storage-backend` على هوستنجر، تأكد أن رابط `https://hostinger-url/health` يعمل.
+2. في إعدادات Render، تأكد من وضع:
+    - `UPLOAD_PROVIDER=http_storage`
+    - `STORAGE_SERVER_URL=رابط-هوستنجر`
+    - `STORAGE_SERVER_API_KEY=نفس-المفتاح-المستخدم-هناك`
+
+بهذا الشكل، أصبح لديك نظام "Clean Architecture" يفصل بين منطق العمل وتخزين الملفات بشكل احترافي.
+
+
+
+
+
+# المنفذ الذي سيعمل عليه السيرفر
+STORAGE_PORT=5001
+# مفتاح الأمان (يجب أن يكون طويلاً ومعقداً وصعب التخمين)
+# مثال: STORAGE_SERVER_API_KEY=Tilal_v2_Secure_Key_2026_XYZ
+STORAGE_SERVER_API_KEY=اكتب_هنا_مفتاح_سري_من_اختيارك
+# رابط السيرفر على هوستنجر (يستخدم لتوليد روابط الصور)
+STORAGE_SERVER_URL=https://files.telal-kingdom.com
+# المجلد الذي ستخزن فيه الملفات
+LOCAL_UPLOAD_PATH=uploads
+# وضع التشغيل
+NODE_ENV=production
+
+
+
+
+----------------------------------------------------------------------
+
+# إعدادات الرفع (تغيير المزود ليصبح عبر الـ HTTP)
+UPLOAD_PROVIDER=http_storage
+# رابط سيرفر التخزين (الذي قمت بضبطه في الأعلى)
+STORAGE_SERVER_URL=https://files.telal-kingdom.com
+# يجب أن يكون "مطابقاً تماماً" للمفتاح الموجود في سيرفر هوستنجر
+STORAGE_SERVER_API_KEY=نفس_المفتاح_السري_الذي_اخترته_أعلاه
+# إعدادات قاعدة البيانات (تأكد من وجودها كما كانت)
+MONGODB_URI=mongodb+srv://...
+PORT=3000
+NODE_ENV=production
